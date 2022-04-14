@@ -1,0 +1,6 @@
+print ("Hello World!")
+#print ("Hello to me, you, and everyone!")
+#print ("I sure like climbing")
+print ("Visual Studio Code is sweet!")
+#print ("Yay to Mars!")
+#print ("How do I get rid of this text box?")
