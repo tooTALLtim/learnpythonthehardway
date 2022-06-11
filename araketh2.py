@@ -20,11 +20,8 @@ from sys import exit
 class Player(object):
 
     name = 'default'
-
     backpack = {10: "chewed up gum in a wrapper"}
-
     toolbelt = ['lint']
-
     maths_passed = False
 
     def contents_of_backpack(self):
@@ -33,7 +30,7 @@ class Player(object):
     
     def contents_of_toolbelt(self):
         for item in Player.toolbelt:
-            print(f"Dude: \"You have {item} in your toolbelt\"")
+            print(f"Dude: \"You have a {item} in your toolbelt.\"")
     
     def naming(self):
         player_name = (input("Dude: \"And adventurer, what should I call you?\"\n>>>>> "))
@@ -41,8 +38,6 @@ class Player(object):
         player_name = player_name[0:3]
         Player.name = ''.join([str(item) for item in player_name])
         print(f"Dude: \"I'll just call you \'{Player.name}\' for short since now we're friends.\"")
-
-
 
 # have a dictionary that has several artifacts that get popped randomly as player finds them
 class ArtifactsTools(object):
@@ -143,7 +138,6 @@ class OpeningScene(object):
 class Antichamber(object):
 
     room_title = " Entering the Antichamber "
-
     entered = False
 
     global safe_attempts
@@ -303,7 +297,7 @@ class CollapsedStairwell(object):
             CollapsedStairwell.second_entry(self)
 
     def first_entry(self):
-        self.player.collapsedstairwell_looted = True
+        CollapsedStairwell.entered = True
         # self.room_header.cool_header(Hallway.room_title)
         print("\t[going up the very creaky stairs]\n")
         #time.sleep(3)
@@ -335,7 +329,6 @@ class CollapsedStairwell(object):
 class Dungeon(object):
 
     room_title = " Opening the Trapdoor "
-
     entered = False
     cell_looted = False
     box_looted = False
@@ -495,7 +488,7 @@ class Dungeon(object):
         Maybe if you kick it a bunch it'll break open!
         """))
         while box_kicked < 5:
-            kick = input("\"Kick it again!! [hit enter]\"")
+            kick = input("Dude: \"Kick it again!!\" [hit enter]")
             box_kicked += 1
         print("Dude: \"The box broke open! What's in there?\"")
         tool = self.artifactstools.tools_list.pop(random.randrange(len(self.artifactstools.tools_list)))
