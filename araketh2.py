@@ -43,8 +43,8 @@ class Player(object):
 class ArtifactsTools(object):
 
     artifact_dict = {
-        'horn' : 'speak',
-        'scroll' : 'friend',
+        'horn' : 'listen',
+        'scroll' : 'friend ',
         'goblet' : 'and',
         'necklace' : 'enter'
     }
@@ -139,8 +139,6 @@ class Antichamber(object):
 
     room_title = " Entering the Antichamber "
     entered = False
-
-    global safe_attempts
     safe_attempts = 0
 
     def __init__(self):
@@ -216,7 +214,7 @@ class Antichamber(object):
         >>>>> """)
         if choice == "c":
             print("[trying the safe's code]")
-            Antichamber.safe_keypad(self, safe_attempts)
+            Antichamber.safe_keypad(self)
         elif choice == "t":
             print("[trapdoor chosen]")
             Engine.get_room(self, 'dungeon')
@@ -233,10 +231,8 @@ class Antichamber(object):
             """))
             Antichamber.second_entry(self)
     
-    def safe_keypad(self, safe_attempts):
-        
-        print("starting attempts:", safe_attempts)
-
+    def safe_keypad(self):
+        print("starting attempts:", Antichamber.safe_attempts)
         print("""\nDude: \"Got enough of the password? Sweet! Type it in!
         If you can't get it correctly and are frustrated just type \'exit\' to 
         go back to the Antichamber. Or type \'quit\' if you're really over it.
@@ -255,24 +251,25 @@ class Antichamber(object):
         elif password == "quit":
             print(f"\nDude: \"Well it's been fun {self.player.name}, thanks for playing!")
             quit
-        elif password != "speak friend and enter" and safe_attempts <= 3:
+        elif password != "speak friend and enter" and Antichamber.safe_attempts <= 3:
             print("\nDude: \"Well that doesn't work, try again")
-            safe_attempts += 1
-            print("after attempt", safe_attempts)
-            Antichamber.safe_keypad(self, safe_attempts)
-        elif password != "speak friend and enter" and safe_attempts == 4:
+            Antichamber.safe_attempts += 1
+            print("after attempt", Antichamber.safe_attempts)
+            Antichamber.safe_keypad(self)
+        elif password != "speak friend and enter" and Antichamber.safe_attempts == 4:
             print(dedent(f"""
             Dude: \"Hey {self.player.name}, ever read Lord of the Rings?
             You should channel your inner Gandalf, hint hint.\"
             """))
-            safe_attempts += 1
-            print("after attempt", safe_attempts)
-            Antichamber.safe_keypad(self, safe_attempts)
-        elif password != "speak friend and enter" and safe_attempts == 5:
+            Antichamber.safe_attempts += 1
+            print("after attempt", Antichamber.safe_attempts)
+            Antichamber.safe_keypad(self)
+        elif password != "speak friend and enter" and Antichamber.safe_attempts == 5:
             print(dedent("""
             \nDude: \"Hmmm, you're really having a tough go of this. 
             Hop back out to the Antichamber and let's look for more clues.
             """))
+            Antichamber.safe_attempts = 0
             Antichamber.second_entry(self)
         else:
             print("Dude: \"errrrr...FATAL ERROR!!!\"")
@@ -282,7 +279,6 @@ class Antichamber(object):
 class CollapsedStairwell(object):
 
     room_title = " Climbing the Stairwell "
-
     entered = False
 
     def __init__(self):
@@ -506,7 +502,6 @@ class DiningRoom(object):
     maths_three_tries = 0
     maths_three_list_length = 0
     maths_three_list = []
-    maths_passed = False
 
     def __init__(self):
         self.room_header = RoomHeader()
@@ -557,7 +552,9 @@ class DiningRoom(object):
         DiningRoom.question_one(self)
     
     def second_entry(self):
-        print("[The bat has flown away, but the creepy atmosphere remains]")
+        print(f"""Bat: \"Hey {self.player.name}, welcome back!
+        I'm all out of questions right now.
+        """)
         DiningRoom.exit_choices(self)
 
     def question_one(self):
@@ -751,7 +748,7 @@ class DiningRoom(object):
                 print(dedent(f"""
                 Dude: \"Shoot! You don't have anything in your
                 toolbelt to remove those boards over the doorway.
-                Let's keep exploring to find the right tool!\"
+                Let's explore a different way to find the right tool!\"
                 """))
                 DiningRoom.exit_choices(self)
         elif choice == 's':
@@ -775,12 +772,15 @@ class DiningRoom(object):
 # gordian knot around eagle's leg
 # need knife to cut free, can't untie
 # get inscriptions inside bag
-# leaving aviary: only once choice is slide back to Antichamber
+# leaving aviary: only choice is slide back to Antichamber
 # eagle is smarter, rounds numbers 'normally'
 # import decimal
 # from decimal import Decimal
 # use it like so: Decimal('2.555').quantize(Decimal(1'1.00'))
 # >>> '2.56'
+# riddles and phrases!
+# famous musical artists
+# *args and **kwargs
 
 
 
@@ -792,6 +792,7 @@ class Aviary(object):
         self.room_header = RoomHeader()
         self.artifacts_tools = ArtifactsTools()
         self.player = Player()
+        self.testing_tools = TestingTools()
 
     def enter(self):
         print("Entered the Aviary")
@@ -801,29 +802,16 @@ class Aviary(object):
             Aviary.second_entry(self)
             
     def first_entry(self):
-        self.entered = True
-        print("first entry into Aviary")
+        Aviary.entered = True
+        print("""
+        [You walk up the creaky stairs, but they do not break this time. 
+        The stairs wind up to a large room with high windows covering
+        every wall.
+        ]
+        """)
 
     def second_entry(self):
         pass
-
-
-#Aviary.entered = True
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
