@@ -4,8 +4,8 @@ Welcome to Araketh! Gather all the Artifacts to unlock the Vault in the Anitcham
 
 # this imports the XKCD antigravity comic
 from cgi import FieldStorage
-from pickletools import float8
-from pydoc import plain
+# from pickletools import float8 # I don't think I added this...
+# from pydoc import plain # I don't think I added this...
 # this imports the time function so the header rolls down slowly
 import time
 # let's make those printed dictionaries look pretty!
@@ -16,21 +16,28 @@ import random
 from textwrap import dedent
 # A nice way to exit the game.
 from sys import exit
+from unicodedata import name
 
 class Player(object):
 
     name = 'default'
-    backpack = {10: "chewed up gum in a wrapper"}
+    backpack = {"chewed up gum in a wrapper": "Wrigley"}
     toolbelt = ['lint']
     maths_passed = False
 
     def contents_of_backpack(self):
+        item_number = 1
+        print(f"Dude: \"Here's what's in your backpack {Player.name}:")
         for item, writing in list(Player.backpack.items()):
-            print(f"the {item} has \'{writing}\' written on it")
+            print(f"{item_number} - a {item} has \'{writing}\' written on it")
+            item_number += 1
     
     def contents_of_toolbelt(self):
+        item_number = 1
+        print("Dude: \"Here's what's in your toolbelt:")
         for item in Player.toolbelt:
-            print(f"Dude: \"You have a {item} in your toolbelt.\"")
+            print(f"{item_number} - {item}")
+            item_number += 1
     
     def naming(self):
         player_name = (input("Dude: \"And adventurer, what should I call you?\"\n>>>>> "))
@@ -43,22 +50,25 @@ class Player(object):
 class ArtifactsTools(object):
 
     artifact_dict = {
-        'horn' : 'listen',
-        'scroll' : 'friend ',
-        'goblet' : 'and',
-        'necklace' : 'enter'
-    }
+        'goblet' : '''It is a strange fate that we should suffer so much fear 
+        and doubt over so small a thing … such a little thing.''',
+        'horn' : 'The wise speak only of what they know.',
+        'necklace' : """Into his heart, the thought will not enter that any will
+        refuse it — that having the Ring we may seek to destroy it. 
+        If we seek this, we shall put him out of reckoning.""",
+        'scroll': 'Gandalf, my old friend this will be a night to remember.'
+        }
 
     tools_list = ['prybar', 'can of WD40', 'knife']
 
     def __init__(self):
         self.player = Player()
 
-    def reveal_artifact(self, key, value):
-        ArtifactsTools.artifact_dict.pop(key, value)
-        print(f"Dude: \"Sweet! You found a {key} with \'{value}\' written on it.")
+    def reveal_artifact(self, key):
+        script = ArtifactsTools.artifact_dict.pop(key)
+        print(f"Dude: \"Sweet! You found a {key} with \'{script}\' written on it.")
         print("Dude: \"I'll toss that in your backpack...\"")
-        self.player.backpack[key] = value
+        self.player.backpack[key] = script
 
     def pop_tool(self):
         # pop a random tool out of the tools_list for the Player to use later
@@ -68,8 +78,7 @@ class ArtifactsTools(object):
         I'll put it in your toolbelt for you...there, stowed away.\"
         """))
         self.player.toolbelt.append(tool)
-        print("Dude: \"By the way, here's what's in your toolbelt:")
-        print(self.player.toolbelt)
+
 
 
 # handles the headers for all the rooms
@@ -191,6 +200,8 @@ class Antichamber(object):
             Engine.get_room(self, 'dungeon')
         elif choice == "s":
             Engine.get_room(self, 'collapsedstairwell')
+        # elif choice == 'a':
+        #     Engine.get_room(self, 'aviary')
         else:
             #time.sleep(2)
             print(f"""
@@ -223,6 +234,8 @@ class Antichamber(object):
         elif choice == "h":
             print("[hallway chosen]")
             Engine.get_room(self, 'diningroom')
+        # elif choice == 'a':
+        #     Engine.get_room(self, 'aviary')
         else:
             #time.sleep(2)
             print(dedent(f"""
@@ -406,7 +419,7 @@ class Dungeon(object):
                 print("Dude: \"Ok, going back up the stairs!\"")
                 Engine.get_room(self, 'antichamber')
             else:
-                print("what broke?")
+                print("Dude: \"Huh? Try that again.\"")
                 exit
         elif Dungeon.box_looted == False and Dungeon.cell_looted == True:
             print(dedent(f"""
@@ -468,8 +481,8 @@ class Dungeon(object):
         """)
         print("[you slip into the cell and find a small, velvet, bag with two items inside]")
         print("Dude: \"Cool, what'd you find?!?!\"")
-        self.artifactstools.reveal_artifact('scroll', 'friend')
-        self.artifactstools.reveal_artifact('glass', 'and')        
+        self.artifactstools.reveal_artifact('necklace')
+        self.artifactstools.reveal_artifact('goblet')        
         print("Dude: \"Done. Here's what's in there:\"")
         self.player.contents_of_backpack()
         Dungeon.second_choice(self)
@@ -595,9 +608,9 @@ class DiningRoom(object):
     # same number of times as the 'except' is raised. So i broke it out into 
     # two functions (make_list and fill_list) and it works properly.
     def make_list(self):
-        DiningRoom.maths_three_list_length = input("How long do you want our list to be?\ntype a number 1-6 >>> ")
-        one_to_six = ['1', '2', '3', '4', '5', '6']
-        if DiningRoom.maths_three_list_length in one_to_six:
+        DiningRoom.maths_three_list_length = input("How long do you want our list to be?\ntype a number 3-6 >>> ")
+        three_to_six = ['3', '4', '5', '6']
+        if DiningRoom.maths_three_list_length in three_to_six:
             print(dedent("""
             Bat: \"yusss, you followed my directions. now let's fill that list up with numbers
             Whole numbers (integers) only, please.\"
@@ -605,7 +618,7 @@ class DiningRoom(object):
             DiningRoom.maths_three_list_length = int(DiningRoom.maths_three_list_length)
             DiningRoom.fill_list(self)
         else:
-            print("Bat \"That isn't a number 1-6, try again please!\"")
+            print("Bat \"That isn't a number 3-6, try again please!\"")
             DiningRoom.make_list(self)
     
     def fill_list(self):
@@ -639,7 +652,9 @@ class DiningRoom(object):
         print("Bat: \"And the sum of those numbers is", bat_maths['sum'])
         print(dedent("""
         Bat: \"Your final question is: what is the mean (average) of those numbers?
-        Please round to the nearest integer.\"
+        Please round to the nearest integer. But I round a little
+        differently than you may have been taught. I round 2.3 to 2, 2.7 to 3,
+        but 2.5 rounds to 2! And 3.5 rounds to 4, of course. Have fun!\"
         """))
         
         # Did some troubleshooting and found out about how  
@@ -650,7 +665,7 @@ class DiningRoom(object):
         q_3_answer = round(bat_maths["mean"]) # the round function changes the float to an integer!
         # print("and after rounding it's a type:")
         # print(type(q_3_answer))
-        print("CHEAT CODE The answer is:", q_3_answer)
+        # print("CHEAT CODE The answer is:", q_3_answer)
 
         your_answer = input(">>>>> ")
         if self.testing_tools.is_a_number(your_answer) == True:
@@ -726,8 +741,9 @@ class DiningRoom(object):
             print(dedent(f"""
             Dude: \"Those boards over the doorway are on there tight!
             Do you have a tool you could use to remove them?
-            Let's look at your toolbelt: {self.player.toolbelt}
+            Let's look at your toolbelt:
             """))
+            self.player.contents_of_toolbelt()
             if 'prybar' in self.player.toolbelt:
                 print(dedent(f"""
                 Dude: \"Sweet! you have a prybar! 
@@ -768,11 +784,6 @@ class DiningRoom(object):
             DiningRoom.exit_choices(self)
 
 
-
-# gordian knot around eagle's leg
-# need knife to cut free, can't untie
-# get inscriptions inside bag
-# leaving aviary: only choice is slide back to Antichamber
 # eagle is smarter, rounds numbers 'normally'
 # import decimal
 # from decimal import Decimal
@@ -781,12 +792,10 @@ class DiningRoom(object):
 # riddles and phrases!
 # famous musical artists
 # *args and **kwargs
-
-
-
 class Aviary(object):
     room_title = " Entering the Aviary "
     entered = False
+    reward_received = False
 
     def __init__(self):
         self.room_header = RoomHeader()
@@ -806,13 +815,155 @@ class Aviary(object):
         print("""
         [You walk up the creaky stairs, but they do not break this time. 
         The stairs wind up to a large room with high windows covering
-        every wall.
-        ]
+        every wall. You walk up to one and look out: green plains
+        stretch out in every direction as you are at a dizzying height.]
         """)
+        print(dedent(f"""
+        Dude: \"Cool! I tell you what {self.player.name},
+        haven't been up here in a minute. I wonder where...\"
+        """))
+        print("""
+        [A loud flapping of wings gradually gets louder...
+        and then a great Golden Eagle flies in through an
+        open window and into the room!]
+        """)
+        print(dedent("""
+        Eagle: \"Hey hey, how's it going Dude!
+        And who's your friend?\"
+        """))
+        print(dedent(f"""
+        Dude: \"Oh, heya Eagle! Long time no see!
+        This is my new friend {self.player.name}.\"
+        """))
+        print(dedent(f"""
+        {self.player.name}: \"Hi Eagle,
+        nice to make your acquaintance!\"
+        """))
+        print(dedent(f"""
+        Eagle: \"The pleaseure is mine, {self.player.name}.
+        Hey, you wouldn't happen to have a knife with you?
+        Dude is too little to carry one big enough.
+        My new bag of tasty treats is just too tough
+        for my talons to rip through.\"
+        """))
+        if 'knife' in self.player.toolbelt:
+            print(dedent(f"""
+            {self.player.name}: \"I sure do! 
+            Here, I'll cut that open for you...done.
+            Mmmmm, salmon, good choice!\"
+            """))
+            Aviary.get_reward(self)
+        else:
+            print(dedent(f"{self.player.name}: \"Aww shoot, I don't!\""))
+            print(dedent(f"""
+            Eagle: \"No worries {self.player.name}! 
+            Swing back my way when you do
+            and I think we can help each other out!\"
+            """))
+            print(dedent(f"""
+            Dude: \"Cool cool cool. Well {self.player.name},
+            let's head back to the Dining Room and
+            come back when you find a knife.\"
+            """))
+            Engine.get_room(self, 'diningroom')
 
     def second_entry(self):
-        pass
+        if Aviary.reward_received == False:
+            print(dedent(f"""
+            Eagle: \"Hey {self.player.name}, welcome back!
+            Did you come back with a knife to help me out?
+            """))
+            if 'knife' in self.player.toolbelt:
+                print(dedent(f"""
+                {self.player.name}: \"I found one! 
+                Here, I'll cut that open for you...done.
+                Mmmmm, salmon, good choice!\"
+                """))
+                Aviary.get_reward(self)
+            else:
+                print(dedent(f"{self.player.name}: \"Aww shoot, I don't!\""))
+                print(dedent(f"""
+                Eagle: \"No worries {self.player.name}! 
+                I'll be here, waiting on your help.\"
+                """))
+                print(dedent(f"""
+                Dude: \"Cool cool cool. Well {self.player.name},
+                let's head back to the Dining Room and
+                come back when you find a knife.\"
+                """))
+                Engine.get_room(self, 'diningroom')
+        elif Aviary.reward_received == True:
+            print(dedent(f"""
+            Eagle: \"Hey {self.player.name}, what's the good word?
+            Thanks for using your knife to open that bag for me,
+            did you want to go over the code words again?
+            """))
+            answer = input("y for yes\nn for no\n>>>>> ")
+            if answer == "y":
+                print("Eagle: \"Sweet!\"")
+                Aviary.reveal_codewords(self)
+            else:
+                print("Eagle: \"No worries! See you later.\"")
+                Engine.get_room(self, 'diningroom')
+    
+    def get_reward(self):
+        Aviary.reward_received = True
+        print(dedent(f"""
+        Eagle: \"I really appreciate your help, {self.player.name}!
+        Here are a few dusty artifacts I've been keeping around.
+        I know they'll help you figure out that code in the Antichamber.
+        """))
+        self.artifacts_tools.reveal_artifact('scroll')
+        self.artifacts_tools.reveal_artifact('horn')
+        self.player.contents_of_backpack()
+        Aviary.reveal_codewords(self)
+    
+    def reveal_codewords(self):
+        print(dedent(f"""
+        Eagle: \"That's cool you've been looking for the old relics!
+        What have you found so far?\"
+        """))
+        self.player.contents_of_backpack()
+        print(dedent(f"""
+        Eagle: \"And let's take a closer look
+        at those inscriptions. I need to look at all the words
+        and check each out. I know that just one code word is
+        hidden in each description. Gimme a minute...
+        """))
+        inscriptions_found = self.player.backpack.values()
+        # print(inscriptions_found)
+        inscription_words = []
+        the_answer = ['speak', 'friend', 'and', 'enter']
+        for words in inscriptions_found:
+            inscription_words.extend(words.split(" ")) # The split function makes a list!
+            print(inscription_words)
+        # print("the answer list:", the_answer)
+        have_correct_words = any(ele in inscription_words for ele in the_answer)
+        # print("Does user have some correct words?", have_correct_words)
+        if have_correct_words == True:
+            print("""Eagle: \"You do have part of the code!
+            The following words are indeed part of the code:\"
+            """)
+            res = [i for i in inscription_words if i in the_answer]
+            print(res)
+            print("Eagle: \"I hope that helps you figure out the code!\"")
+            print(dedent(f"""
+            Dude: \"Outstanding, thanks for the help Eagle!
+            Well {self.player.name}, let's head back to the Dining Room so
+            we can continue looking for artifacts or go to the Antichamber
+            to try and solve the code!\"
+            """))
+            Engine.get_room(self, 'diningroom')
+        else:
+            print("Eagle: \"Hmmm, none of those words are in the code, keep looking!")
+            print(dedent(f"""
+            Dude: \"Cool cool cool. Well {self.player.name},
+            let's head back to the Dining Room and
+            continue looking for artifacts.\"
+            """))
+            Engine.get_room(self, 'diningroom')
 
+# have if condition where if user has < 4 codewords it prompts differently than if they have all of them
 
 
 
